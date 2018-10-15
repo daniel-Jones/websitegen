@@ -37,14 +37,6 @@ getfilelength(FILE *fp)
 	return retval;
 }
 
-void
-appendchar(char *dest, char ch)
-{
-	int len = strlen(dest);
-	dest[len] = ch;
-	dest[len+1] = '\0';
-}
-
 int
 replaceinfile(char *originalfile, char *destinationfile, char *placeholder, char *replacement)
 {

@@ -37,6 +37,14 @@ getfilelength(FILE *fp)
 	return retval;
 }
 
+void
+replaceappendchar(char *dest, char ch)
+{
+	int len = strlen(dest);
+	dest[len] = ch;
+	dest[len+1] = '\0';
+}
+
 int
 replaceinfile(char *originalfile, char *destinationfile, char *placeholder, char *replacement)
 {
@@ -77,4 +85,42 @@ replaceinfile(char *originalfile, char *destinationfile, char *placeholder, char
 	fclose(destination);
 	free(filebuffer);
 	return 1;
+}
+
+char *
+replaceinmemory(char *src, char *placeholder, char *replacement)
+{
+	/*
+	 * replace every placeholder with replacement in source src
+	 * return pointer to string, NULL if no placement found
+	 * user must free the returned memory
+	 */
+	char *dest = NULL;
+	size_t destsize;
+	char *substr = strstr(src, placeholder);
+	if (!substr)
+		return NULL;
+	/* initial dest size if only one placeholder exists */
+	destsize = (strlen(src)-strlen(placeholder))+strlen(replacement+1);
+	dest = malloc(destsize);
+	if (!dest)
+		return NULL;
+	dest[0] = '\0'; /* junk in memory, we need [0] to be null for strlen() later */
+	for (size_t i = 0; i < strlen(src); i++)
+	{
+		if (i == (substr-src))
+		{
+			i += strlen(placeholder);
+			substr++;
+			substr = strstr(substr, placeholder);
+			if (substr)
+			{
+				destsize = (destsize-strlen(placeholder))+strlen(replacement)+1;
+				dest = realloc(dest, destsize);
+			}
+			strcat(dest, replacement);
+		}
+		replaceappendchar(dest, src[i]);
+	}
+	return dest;
 }

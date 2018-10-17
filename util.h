@@ -16,39 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#ifndef UTIL_H
+#define UTIL_H
 
-#include "util.h"
-#include "replace.h"
-#include "cfg.h"
+char *
+readfilecontent(char *file);
 
-
-int
-main(void)
-{
-	struct cfgfile *cfg = malloc(sizeof(struct cfgfile));
-	if (!cfgsetup(cfg, "settings.cfg"))
-	{
-		perror("failed to create cfg structure");
-		cfgfree(cfg);
-		exit(1);
-	}
-	char test[256];
-	cfggetvalue(cfg, "blogtitle", test, sizeof(test));
-	puts(test);
-	char val[3];
-	cfggetvalue(cfg, "postsperpage", val, sizeof(val));
-	printf("%d\n", atoi(val)*2);
-	cfgfree(cfg);
-
-	char *content = readfilecontent("templates/template.txt");
-	if (!content)
-		perror("unable to read file");
-	char *replaced = replaceinmemory(content, "{CONTENT}", "test");
-	puts(replaced);
-	free(content);
-	free(replaced);
-	return 0;
-}
+#endif
